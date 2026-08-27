@@ -439,12 +439,15 @@ html,body{
 "use strict";
 
 /* ============================================================
-   CONFIGURAÇÃO DA IA (LINKS E MODELOS ATUALIZADOS)
+   CONFIGURAÇÃO DA IA
    ============================================================ */
-// ATENÇÃO: Confirme se este link é o mesmo gerado na tela preta atual do túnel!
-const OLLAMA_URL = "https://1fe37640f50654d2-201-57-125-34.serveousercontent.com/api/generate";
+// >>> INSIRA SEU LINK DO SERVEO AQUI (Lembre-se de manter o /api/generate no final) <<<
+const OLLAMA_URL = "https://SEU-LINK-AQUI.serveo.net/api/generate";
+
 const OLLAMA_MODEL = "gemma3:1b"; 
-const SYSTEM_PROMPT = "Você é NEXUS, uma interface neural e inteligência artificial holográfica avançada. Responda de forma concisa, direta e com um tom futurista, lógico e prestativo. Nunca use formatação markdown ou emojis nas suas respostas, pois elas serão lidas por um sintetizador de voz. Fale sempre em português do Brasil.";
+
+// Prompt ajustado para fazer a IA falar de forma mais humana e coloquial
+const SYSTEM_PROMPT = "Você é NEXUS. Aja como um humano conversando naturalmente, com carisma e tom amigável. Use frases curtas e diretas. Se precisar pensar, use reticências (...) para criar pausas naturais na fala. Nunca use markdown, asteriscos, emojis ou listas. Fale sempre em português do Brasil coloquial.";
 
 const PARTICLE_COUNT = (function(){
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -875,17 +878,30 @@ function stopSpeechRecognition(){
 }
 
 /* ============================================================
-   SÍNTESE DE VOZ
+   SÍNTESE DE VOZ (VERSÃO HUMANIZADA / NÍVEL 2)
    ============================================================ */
 function speak(text){
   if(!window.speechSynthesis){ return; }
-  const utter = new SpeechSynthesisUtterance(text);
+  
+  // Limpa o texto de qualquer caractere estranho que faça o robô bugar
+  const cleanText = text.replace(/[*_#`~]/g, ''); 
+  
+  const utter = new SpeechSynthesisUtterance(cleanText);
   const voices = window.speechSynthesis.getVoices();
-  const ptVoice = voices.find(v=>v.lang && v.lang.toLowerCase().startsWith('pt'));
-  if(ptVoice) utter.voice = ptVoice;
+  
+  // Caça as vozes premium do sistema operacional
+  const premiumVoice = voices.find(v => v.name.includes('Google português do Brasil')) || 
+                       voices.find(v => v.name.includes('Microsoft Francisca') || v.name.includes('Microsoft Antonio')) ||
+                       voices.find(v => v.name.includes('Luciana')) ||
+                       voices.find(v => v.lang === 'pt-BR');
+                       
+  if(premiumVoice) utter.voice = premiumVoice;
+  
   utter.lang = 'pt-BR';
-  utter.rate = 1.02;
-  utter.pitch = 1.0;
+  // Ajustes de cadência para soar mais humano
+  utter.rate = 1.08; 
+  utter.pitch = 1.05; 
+  
   window.speechSynthesis.speak(utter);
 }
 
